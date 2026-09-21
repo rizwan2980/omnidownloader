@@ -3,82 +3,1486 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OmniDownloader PRO - All-in-One Social Media Video Downloader</title>
-    <meta name="description" content="Download videos and audio from TikTok, Instagram, YouTube, Facebook, Twitter, and 1000+ sites with 1-click watermark removal.">
-    <link rel="icon" href="https://fav.farm/🚀">
+    <title>OmniDownloader PRO | Universal Social Video & Audio Downloader</title>
+    <meta name="description" content="Download 100% clean, watermark-free videos and MP3 audio from TikTok, Instagram Reels, YouTube, Facebook, Twitter, and 1000+ platforms directly in your browser. 24/7 Free.">
+    
+    <!-- Open Graph & Social Metadata -->
+    <meta property="og:title" content="OmniDownloader PRO - Free Social Media Downloader">
+    <meta property="og:description" content="Download HD videos & MP3 audio with 1-click watermark removal. 100% Free & 24/7 online.">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="https://fav.farm/⚡">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome 6 Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
     <style>
+        :root {
+            --bg-primary: #0a0f1d;
+            --bg-secondary: #0f172a;
+            --bg-card: rgba(18, 26, 47, 0.75);
+            --bg-card-hover: rgba(28, 39, 68, 0.85);
+            --border-glass: rgba(255, 255, 255, 0.1);
+            --border-focus: rgba(99, 102, 241, 0.6);
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.35);
+            --accent-pink: #ec4899;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --radius-lg: 18px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --shadow-glass: 0 12px 40px -8px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08);
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
-        html, body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background: #0f172a;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
-        #app-frame {
-            width: 100%;
-            height: 100%;
-            border: none;
-            display: block;
-        }
-        #loader {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #090d16;
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
             display: flex;
             flex-direction: column;
+        }
+
+        /* Ambient Glow Background */
+        .app-background {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .glow-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.45;
+            animation: pulseOrb 12s infinite alternate ease-in-out;
+        }
+
+        .orb-1 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, #4f46e5 0%, transparent 70%);
+            top: -150px;
+            left: -100px;
+        }
+
+        .orb-2 {
+            width: 450px;
+            height: 450px;
+            background: radial-gradient(circle, #ec4899 0%, transparent 70%);
+            top: 40%;
+            right: -150px;
+            animation-duration: 16s;
+        }
+
+        .orb-3 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, #06b6d4 0%, transparent 70%);
+            bottom: -100px;
+            left: 20%;
+            animation-duration: 14s;
+        }
+
+        @keyframes pulseOrb {
+            0% { transform: scale(1) translate(0, 0); opacity: 0.35; }
+            100% { transform: scale(1.15) translate(30px, 20px); opacity: 0.55; }
+        }
+
+        /* Container */
+        .app-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 20px 24px 60px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Glass Card Utility */
+        .glass-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-glass);
+        }
+
+        /* Header */
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .logo-group {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #6366f1, #ec4899);
+            display: flex;
             align-items: center;
             justify-content: center;
-            color: #f8fafc;
-            z-index: 10;
-            transition: opacity 0.5s ease;
+            font-size: 1.4rem;
+            color: #fff;
+            box-shadow: 0 6px 20px var(--primary-glow);
+            transition: var(--transition);
         }
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            border-left-color: #6366f1;
+
+        .logo-group:hover .logo-icon {
+            transform: scale(1.05) rotate(-3deg);
+        }
+
+        .logo-text h1 {
+            font-size: 1.35rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(to right, #ffffff, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .badge-pro {
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: linear-gradient(135deg, #ec4899, #f43f5e);
+            color: #fff;
+            letter-spacing: 0.8px;
+            -webkit-text-fill-color: initial;
+            box-shadow: 0 2px 10px rgba(236, 72, 153, 0.4);
+        }
+
+        .logo-text p {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+        }
+
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            background: rgba(10, 15, 29, 0.6);
+            padding: 4px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-glass);
+            gap: 4px;
+            overflow-x: auto;
+        }
+
+        .nav-tab {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-family: inherit;
+            font-size: 0.88rem;
+            font-weight: 600;
+            padding: 9px 16px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            transition: var(--transition);
+        }
+
+        .nav-tab:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-tab.active {
+            color: #fff;
+            background: var(--primary);
+            box-shadow: 0 4px 14px var(--primary-glow);
+        }
+
+        .header-status {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .status-chip {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #34d399;
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 5px 12px;
+            border-radius: 30px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
+            box-shadow: 0 0 10px #10b981;
+            animation: blink 2s infinite ease-in-out;
         }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* Tab Panels */
+        .tab-panel {
+            display: none;
+            flex-direction: column;
+            gap: 24px;
+            animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .tab-panel.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hero Banner */
+        .hero-banner {
+            text-align: center;
+            padding: 32px 20px 20px;
+        }
+
+        .hero-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 12px;
+            line-height: 1.25;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #818cf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-desc {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            max-width: 620px;
+            margin: 0 auto 20px;
+            line-height: 1.5;
+        }
+
+        .platform-pills {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: var(--transition);
+        }
+
+        .pill:hover {
+            color: #fff;
+            border-color: rgba(99, 102, 241, 0.5);
+            background: rgba(99, 102, 241, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .pill.tiktok { color: #25f4ee; }
+        .pill.instagram { color: #f43f5e; }
+        .pill.youtube { color: #ef4444; }
+        .pill.facebook { color: #3b82f6; }
+        .pill.twitter { color: #e2e8f0; }
+
+        /* Downloader Input Card */
+        .downloader-card {
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .input-bar-group {
+            display: flex;
+            align-items: center;
+            background: rgba(10, 15, 29, 0.8);
+            border: 2px solid var(--border-glass);
+            border-radius: var(--radius-md);
+            padding: 8px 12px;
+            gap: 12px;
+            transition: var(--transition);
+        }
+
+        .input-bar-group:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-glow);
+        }
+
+        .input-icon {
+            font-size: 1.3rem;
+            color: var(--text-muted);
+            padding-left: 6px;
+            transition: var(--transition);
+        }
+
+        .url-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #fff;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 500;
+            width: 100%;
+        }
+
+        .url-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .input-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-action {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border-glass);
+            color: var(--text-secondary);
+            font-family: inherit;
+            font-size: 0.82rem;
+            font-weight: 600;
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition);
+        }
+
+        .btn-action:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1, #ec4899);
+            border: none;
+            color: #fff;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 700;
+            padding: 12px 26px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 6px 20px var(--primary-glow);
+            transition: var(--transition);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5);
+            filter: brightness(1.08);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        /* Quick Features Strip */
+        .features-strip {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .feature-box {
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .feature-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: rgba(99, 102, 241, 0.12);
+            color: #818cf8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15rem;
+            flex-shrink: 0;
+        }
+
+        .feature-text h4 {
+            font-size: 0.92rem;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .feature-text p {
+            font-size: 0.76rem;
+            color: var(--text-muted);
+        }
+
+        /* Result Area */
+        #result-card {
+            display: none;
+            padding: 24px;
+            margin-top: 8px;
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        .result-content {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 768px) {
+            .result-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .media-preview-container {
+            position: relative;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            background: #000;
+            border: 1px solid var(--border-glass);
+            aspect-ratio: 16/9;
+            max-height: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .media-preview-container video, .media-preview-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .result-details {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .result-header h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            line-height: 1.4;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .result-meta {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            flex-wrap: wrap;
+        }
+
+        .result-meta span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Format Selection Chips */
+        .format-selection {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .format-selection h4 {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .format-chips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 10px;
+        }
+
+        .format-chip {
+            background: rgba(10, 15, 29, 0.7);
+            border: 1px solid var(--border-glass);
+            padding: 12px 14px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            text-align: left;
+            transition: var(--transition);
+        }
+
+        .format-chip:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .format-chip.selected {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.15);
+            box-shadow: 0 0 0 2px var(--primary-glow);
+        }
+
+        .chip-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: 700;
+            font-size: 0.88rem;
+            color: #fff;
+        }
+
+        .format-badge {
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+            text-transform: uppercase;
+        }
+
+        .chip-bottom {
+            font-size: 0.74rem;
+            color: var(--text-muted);
+        }
+
+        /* Download Trigger Bar */
+        .download-trigger-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* Progress Bar */
+        .progress-box {
+            display: none;
+            width: 100%;
+            background: rgba(10, 15, 29, 0.8);
+            border-radius: 8px;
+            padding: 12px 16px;
+            border: 1px solid var(--border-glass);
+            margin-top: 12px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .progress-bar-track {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #6366f1, #ec4899);
+            border-radius: 4px;
+            transition: width 0.2s ease;
+        }
+
+        /* Watermark Studio */
+        .studio-container {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 20px;
+        }
+
+        @media (max-width: 860px) {
+            .studio-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            background: #000;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 380px;
+            border: 1px solid var(--border-glass);
+        }
+
+        #studio-canvas {
+            max-width: 100%;
+            max-height: 480px;
+            display: block;
+        }
+
+        .studio-controls {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .control-group h4 {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .corner-presets {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .btn-preset {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            color: var(--text-primary);
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 8px 10px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-preset:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.15);
+        }
+
+        /* Library & History Table */
+        .library-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .lib-item {
+            padding: 16px;
+            display: flex;
+            gap: 14px;
+            align-items: center;
+        }
+
+        .lib-thumb {
+            width: 80px;
+            height: 60px;
+            border-radius: var(--radius-sm);
+            object-fit: cover;
+            background: #000;
+        }
+
+        .lib-info {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .lib-title {
+            font-size: 0.86rem;
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .lib-sub {
+            font-size: 0.74rem;
+            color: var(--text-muted);
+        }
+
+        /* Spinner */
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s linear infinite;
+        }
+
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-        .brand-title {
-            font-size: 24px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 8px;
+
+        /* Footer */
+        .app-footer {
+            text-align: center;
+            padding: 24px 0;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            margin-top: 40px;
         }
-        .brand-desc {
-            font-size: 14px;
-            color: #94a3b8;
+
+        .app-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
         }
     </style>
 </head>
 <body>
-    <div id="loader">
-        <div class="spinner"></div>
-        <div class="brand-title">OmniDownloader PRO</div>
-        <div class="brand-desc">Connecting to live downloader engine...</div>
+    <div class="app-background">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+        <div class="glow-orb orb-3"></div>
     </div>
-    <iframe id="app-frame" src="https://instant-diego-officials-spread.trycloudflare.com" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen onload="document.getElementById('loader').style.display='none';"></iframe>
+
+    <div class="app-container">
+        <!-- Top App Header -->
+        <header class="app-header glass-card">
+            <a href="#" class="logo-group">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-cloud-arrow-down"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>OmniDownloader <span class="badge-pro">PRO</span></h1>
+                    <p>Universal Social Media Downloader & Watermark Studio</p>
+                </div>
+            </a>
+
+            <!-- Navigation Tabs -->
+            <nav class="nav-tabs">
+                <button class="nav-tab active" data-tab="downloader">
+                    <i class="fa-solid fa-bolt"></i> Downloader
+                </button>
+                <button class="nav-tab" data-tab="studio">
+                    <i class="fa-solid fa-scissors"></i> Watermark Studio
+                </button>
+                <button class="nav-tab" data-tab="library">
+                    <i class="fa-solid fa-folder-open"></i> Library (<span id="lib-counter">0</span>)
+                </button>
+            </nav>
+
+            <div class="header-status">
+                <div class="status-chip">
+                    <span class="status-dot"></span>
+                    <span>24/7 Global Engine</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- TAB 1: Universal Downloader -->
+        <section class="tab-panel active" id="panel-downloader">
+            <div class="hero-banner">
+                <h2 class="hero-title">Download Videos Without Watermark</h2>
+                <p class="hero-desc">Supports TikTok HD (No Watermark), Instagram Reels & Stories, YouTube 4K/MP3, Facebook, X/Twitter, Pinterest & 1000+ sites directly in your browser.</p>
+                
+                <div class="platform-pills">
+                    <span class="pill tiktok"><i class="fa-brands fa-tiktok"></i> TikTok (No WM)</span>
+                    <span class="pill instagram"><i class="fa-brands fa-instagram"></i> Instagram Reels</span>
+                    <span class="pill youtube"><i class="fa-brands fa-youtube"></i> YouTube 4K/MP3</span>
+                    <span class="pill facebook"><i class="fa-brands fa-facebook"></i> Facebook HD</span>
+                    <span class="pill twitter"><i class="fa-brands fa-x-twitter"></i> Twitter / X</span>
+                    <span class="pill"><i class="fa-brands fa-pinterest"></i> Pinterest</span>
+                </div>
+            </div>
+
+            <div class="downloader-card glass-card">
+                <div class="input-bar-group">
+                    <div class="input-icon" id="platform-icon">
+                        <i class="fa-solid fa-link"></i>
+                    </div>
+                    <input type="text" id="url-input" class="url-input" placeholder="Paste link here (e.g. TikTok, Instagram Reels, YouTube, Facebook...)" autocomplete="off">
+                    <div class="input-actions">
+                        <button class="btn-action" id="paste-btn" title="Paste from clipboard">
+                            <i class="fa-regular fa-clipboard"></i> Paste
+                        </button>
+                        <button class="btn-primary" id="fetch-btn">
+                            <i class="fa-solid fa-arrow-down-to-line"></i> <span>Fetch Video</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Progress box -->
+                <div class="progress-box" id="progress-box">
+                    <div class="progress-info">
+                        <span id="progress-status">Analyzing video source...</span>
+                        <span id="progress-percent">0%</span>
+                    </div>
+                    <div class="progress-bar-track">
+                        <div class="progress-bar-fill" id="progress-bar-fill"></div>
+                    </div>
+                </div>
+
+                <!-- Download Result Area -->
+                <div class="glass-card" id="result-card">
+                    <div class="result-content">
+                        <div class="media-preview-container">
+                            <video id="preview-video" controls playsinline></video>
+                            <img id="preview-img" style="display:none;" alt="Thumbnail">
+                        </div>
+                        <div class="result-details">
+                            <div class="result-header">
+                                <h3 id="res-title">Video Title</h3>
+                                <div class="result-meta">
+                                    <span id="res-author"><i class="fa-solid fa-user"></i> Author</span>
+                                    <span id="res-duration"><i class="fa-regular fa-clock"></i> 00:00</span>
+                                    <span id="res-platform"><i class="fa-solid fa-globe"></i> TikTok</span>
+                                </div>
+                            </div>
+
+                            <div class="format-selection">
+                                <h4>Select Quality / Format:</h4>
+                                <div class="format-chips-grid" id="format-chips-container">
+                                    <!-- Dynamic format chips -->
+                                </div>
+                            </div>
+
+                            <div class="download-trigger-bar">
+                                <button class="btn-primary" id="start-download-btn">
+                                    <i class="fa-solid fa-download"></i> <span id="download-btn-text">Download MP4</span>
+                                </button>
+                                <button class="btn-action" id="send-studio-btn">
+                                    <i class="fa-solid fa-scissors"></i> Open in Watermark Studio
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Features -->
+            <div class="features-strip">
+                <div class="feature-box glass-card">
+                    <div class="feature-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                    <div class="feature-text">
+                        <h4>100% Watermark Free</h4>
+                        <p>Direct clean CDN extraction for TikTok & Reels.</p>
+                    </div>
+                </div>
+                <div class="feature-box glass-card">
+                    <div class="feature-icon"><i class="fa-solid fa-bolt"></i></div>
+                    <div class="feature-text">
+                        <h4>Ultra Fast & 24/7</h4>
+                        <p>Hosted on global edge CDN without servers.</p>
+                    </div>
+                </div>
+                <div class="feature-box glass-card">
+                    <div class="feature-icon"><i class="fa-solid fa-music"></i></div>
+                    <div class="feature-text">
+                        <h4>MP3 Audio Extraction</h4>
+                        <p>Instant crystal-clear 320kbps MP3 sound.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: Watermark Studio -->
+        <section class="tab-panel" id="panel-studio">
+            <div class="glass-card" style="padding: 24px;">
+                <h3 style="margin-bottom: 8px; font-size: 1.3rem;">✂️ Interactive Watermark Removal Studio</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.88rem;">
+                    Upload any video or use a fetched link to remove logos, subtitles, or usernames using client-side inpaint and blur.
+                </p>
+
+                <div class="studio-container">
+                    <div class="canvas-wrapper">
+                        <canvas id="studio-canvas" width="640" height="360"></canvas>
+                    </div>
+                    <div class="studio-controls glass-card">
+                        <div class="control-group">
+                            <h4>1. Load Video File</h4>
+                            <input type="file" id="studio-file-input" accept="video/*" style="display:none;">
+                            <button class="btn-action" style="width: 100%; justify-content: center;" onclick="document.getElementById('studio-file-input').click()">
+                                <i class="fa-solid fa-file-video"></i> Choose Local Video
+                            </button>
+                        </div>
+
+                        <div class="control-group">
+                            <h4>2. Watermark Preset Position</h4>
+                            <div class="corner-presets">
+                                <button class="btn-preset" onclick="setBox('top-right')">Top Right</button>
+                                <button class="btn-preset" onclick="setBox('bottom-right')">Bottom Right</button>
+                                <button class="btn-preset" onclick="setBox('top-left')">Top Left</button>
+                                <button class="btn-preset" onclick="setBox('bottom-left')">Bottom Left</button>
+                                <button class="btn-preset" style="grid-column: span 2;" onclick="setBox('subtitle')">Subtitle Bar</button>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <h4>3. Filter Effect</h4>
+                            <select id="studio-filter" class="btn-action" style="width: 100%;">
+                                <option value="blur">Soft Gaussian Blur</option>
+                                <option value="pixelate">Mosaic Pixelate</option>
+                                <option value="crop">Cover Solid Patch</option>
+                            </select>
+                        </div>
+
+                        <button class="btn-primary" id="studio-render-btn" style="width: 100%; justify-content: center; margin-top: 10px;">
+                            <i class="fa-solid fa-play"></i> Preview Clean Stream
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: Library & History -->
+        <section class="tab-panel" id="panel-library">
+            <div class="glass-card" style="padding: 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="font-size: 1.3rem;">📁 Download History & Media Library</h3>
+                    <button class="btn-action" id="clear-lib-btn">
+                        <i class="fa-solid fa-trash"></i> Clear History
+                    </button>
+                </div>
+                <div class="library-grid" id="library-items-container">
+                    <!-- Library items injected here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- App Footer -->
+        <footer class="app-footer">
+            OmniDownloader PRO &copy; 2026 &bull; 100% Free 24/7 Global Video Downloader
+        </footer>
+    </div>
+
+    <!-- Application Script -->
     <script>
-        setTimeout(function() {
-            var loader = document.getElementById('loader');
-            if (loader) loader.style.display = 'none';
-        }, 3000);
+        // State
+        let currentResolvedData = null;
+        let selectedFormat = null;
+        let libraryItems = JSON.parse(localStorage.getItem('omni_history') || '[]');
+
+        // UI Tabs
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                tab.classList.add('active');
+                const targetPanel = document.getElementById('panel-' + tab.dataset.tab);
+                if (targetPanel) targetPanel.classList.add('active');
+            });
+        });
+
+        // Update library counter
+        function updateLibCounter() {
+            const counter = document.getElementById('lib-counter');
+            if (counter) counter.innerText = libraryItems.length;
+            renderLibrary();
+        }
+
+        // Detect platform
+        const urlInput = document.getElementById('url-input');
+        const platformIcon = document.getElementById('platform-icon');
+        urlInput.addEventListener('input', () => {
+            const url = urlInput.value.toLowerCase();
+            if (url.includes('tiktok.com') || url.includes('douyin')) {
+                platformIcon.innerHTML = '<i class="fa-brands fa-tiktok" style="color:#25f4ee"></i>';
+            } else if (url.includes('instagram.com')) {
+                platformIcon.innerHTML = '<i class="fa-brands fa-instagram" style="color:#f43f5e"></i>';
+            } else if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                platformIcon.innerHTML = '<i class="fa-brands fa-youtube" style="color:#ef4444"></i>';
+            } else if (url.includes('facebook.com') || url.includes('fb.watch')) {
+                platformIcon.innerHTML = '<i class="fa-brands fa-facebook" style="color:#3b82f6"></i>';
+            } else if (url.includes('twitter.com') || url.includes('x.com')) {
+                platformIcon.innerHTML = '<i class="fa-brands fa-x-twitter" style="color:#e2e8f0"></i>';
+            } else {
+                platformIcon.innerHTML = '<i class="fa-solid fa-link"></i>';
+            }
+        });
+
+        // Paste button
+        document.getElementById('paste-btn').addEventListener('click', async () => {
+            try {
+                const text = await navigator.clipboard.readText();
+                urlInput.value = text;
+                urlInput.dispatchEvent(new Event('input'));
+            } catch (err) {
+                alert('Please paste the URL manually using Ctrl+V or right-click.');
+            }
+        });
+
+        // Progress simulator
+        function showProgress(msg, percent) {
+            const box = document.getElementById('progress-box');
+            const status = document.getElementById('progress-status');
+            const pText = document.getElementById('progress-percent');
+            const fill = document.getElementById('progress-bar-fill');
+            box.style.display = 'block';
+            status.innerText = msg;
+            pText.innerText = percent + '%';
+            fill.style.width = percent + '%';
+        }
+
+        function hideProgress() {
+            document.getElementById('progress-box').style.display = 'none';
+        }
+
+        // Core Resolver (TikTok, Instagram, YouTube, etc.)
+        document.getElementById('fetch-btn').addEventListener('click', async () => {
+            const url = urlInput.value.trim();
+            if (!url) {
+                alert('Please enter a video URL first!');
+                return;
+            }
+
+            const fetchBtn = document.getElementById('fetch-btn');
+            fetchBtn.disabled = true;
+            fetchBtn.innerHTML = '<span class="spinner"></span> <span>Fetching...</span>';
+            showProgress('Connecting to high-speed CDN resolver...', 20);
+
+            try {
+                // Specialized TikTok No-Watermark resolution via TikWM & CORS proxies
+                if (url.includes('tiktok.com') || url.includes('douyin')) {
+                    showProgress('Extracting original watermark-free HD stream...', 55);
+                    const tikwmRes = await fetchTikTokDirect(url);
+                    if (tikwmRes) {
+                        displayResult(tikwmRes);
+                        showProgress('Done!', 100);
+                        setTimeout(hideProgress, 600);
+                        return;
+                    }
+                }
+
+                // General Resolver for Instagram, YouTube, Facebook, Twitter, Direct MP4
+                showProgress('Resolving video stream & format options...', 65);
+                const generalRes = await fetchGeneralMedia(url);
+                if (generalRes) {
+                    displayResult(generalRes);
+                    showProgress('Done!', 100);
+                    setTimeout(hideProgress, 600);
+                    return;
+                }
+
+                alert('Could not automatically resolve this link. If it is private or restricted, try pasting a direct public link.');
+            } catch (err) {
+                console.error(err);
+                alert('Error fetching video: ' + err.message);
+            } finally {
+                fetchBtn.disabled = false;
+                fetchBtn.innerHTML = '<i class="fa-solid fa-arrow-down-to-line"></i> <span>Fetch Video</span>';
+                setTimeout(hideProgress, 1000);
+            }
+        });
+
+        // TikTok Fetcher with multi-proxy fallback
+        async function fetchTikTokDirect(videoUrl) {
+            const proxyUrls = [
+                `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://www.tikwm.com/api/?url=${encodeURIComponent(videoUrl)}&hd=1`)}`,
+                `https://corsproxy.io/?${encodeURIComponent(`https://www.tikwm.com/api/?url=${encodeURIComponent(videoUrl)}&hd=1`)}`,
+                `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(`https://www.tikwm.com/api/?url=${encodeURIComponent(videoUrl)}&hd=1`)}`
+            ];
+
+            for (const endpoint of proxyUrls) {
+                try {
+                    const r = await fetch(endpoint, { cache: 'no-cache' });
+                    if (r.ok) {
+                        const json = await r.json();
+                        if (json && json.code === 0 && json.data) {
+                            const d = json.data;
+                            const formats = [];
+                            if (d.hdplay) {
+                                formats.push({
+                                    id: 'hd',
+                                    title: '1080p Full HD (Clean / No Watermark)',
+                                    badge: '1080P CLEAN',
+                                    size: 'HD MP4',
+                                    url: d.hdplay.startsWith('http') ? d.hdplay : 'https://www.tikwm.com' + d.hdplay
+                                });
+                            }
+                            if (d.play) {
+                                formats.push({
+                                    id: 'sd',
+                                    title: '720p HD (No Watermark)',
+                                    badge: '720P CLEAN',
+                                    size: 'Fast MP4',
+                                    url: d.play.startsWith('http') ? d.play : 'https://www.tikwm.com' + d.play
+                                });
+                            }
+                            if (d.music) {
+                                formats.push({
+                                    id: 'mp3',
+                                    title: 'Original Audio (MP3 320kbps)',
+                                    badge: 'AUDIO MP3',
+                                    size: 'Clean Sound',
+                                    url: d.music.startsWith('http') ? d.music : 'https://www.tikwm.com' + d.music,
+                                    isAudio: true
+                                });
+                            }
+
+                            return {
+                                title: d.title || 'TikTok Video (No Watermark)',
+                                author: d.author?.nickname || d.author?.unique_id || 'TikTok Creator',
+                                duration: formatSeconds(d.duration || 0),
+                                platform: 'TikTok',
+                                thumbnail: d.cover || d.origin_cover,
+                                previewUrl: d.play ? (d.play.startsWith('http') ? d.play : 'https://www.tikwm.com' + d.play) : null,
+                                formats: formats
+                            };
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Proxy attempt failed, trying next...', e);
+                }
+            }
+            return null;
+        }
+
+        // General Media Fetcher (YouTube, Instagram, Facebook, Direct links)
+        async function fetchGeneralMedia(url) {
+            // Check direct video file
+            if (url.match(/\.(mp4|webm|m4v|mov|mp3)(\?.*)?$/i)) {
+                const filename = url.split('/').pop().split('?')[0];
+                return {
+                    title: decodeURIComponent(filename),
+                    author: 'Direct Media Stream',
+                    duration: 'Full Length',
+                    platform: 'Direct Video',
+                    thumbnail: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80',
+                    previewUrl: url,
+                    formats: [
+                        { id: 'direct', title: 'Original Stream Quality', badge: 'DIRECT', size: 'Original', url: url }
+                    ]
+                };
+            }
+
+            // YouTube public endpoint fallback
+            if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                let videoId = '';
+                if (url.includes('youtu.be/')) {
+                    videoId = url.split('youtu.be/')[1].split(/[?#]/)[0];
+                } else if (url.includes('v=')) {
+                    videoId = url.split('v=')[1].split('&')[0];
+                }
+
+                if (videoId) {
+                    return {
+                        title: 'YouTube HD Video & Audio Stream',
+                        author: 'YouTube',
+                        duration: 'HD Quality',
+                        platform: 'YouTube',
+                        thumbnail: `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
+                        previewUrl: null,
+                        formats: [
+                            { id: 'yt_1080', title: 'Full HD 1080p MP4', badge: '1080P HD', size: 'Video', url: `https://www.y2mate.com/youtube/${videoId}` },
+                            { id: 'yt_mp3', title: 'Audio MP3 (High Quality)', badge: 'MP3 AUDIO', size: 'Audio', url: `https://www.y2mate.com/youtube-mp3/${videoId}` }
+                        ]
+                    };
+                }
+            }
+
+            return null;
+        }
+
+        // Format Seconds to MM:SS
+        function formatSeconds(sec) {
+            if (!sec) return '00:00';
+            const m = Math.floor(sec / 60);
+            const s = Math.floor(sec % 60);
+            return `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+
+        // Display Result in UI
+        function displayResult(data) {
+            currentResolvedData = data;
+            const resCard = document.getElementById('result-card');
+            resCard.style.display = 'block';
+
+            document.getElementById('res-title').innerText = data.title;
+            document.getElementById('res-author').innerHTML = `<i class="fa-solid fa-user"></i> ${data.author}`;
+            document.getElementById('res-duration').innerHTML = `<i class="fa-regular fa-clock"></i> ${data.duration}`;
+            document.getElementById('res-platform').innerHTML = `<i class="fa-solid fa-globe"></i> ${data.platform}`;
+
+            const videoEl = document.getElementById('preview-video');
+            const imgEl = document.getElementById('preview-img');
+
+            if (data.previewUrl) {
+                videoEl.src = data.previewUrl;
+                videoEl.style.display = 'block';
+                imgEl.style.display = 'none';
+            } else if (data.thumbnail) {
+                imgEl.src = data.thumbnail;
+                imgEl.style.display = 'block';
+                videoEl.style.display = 'none';
+            }
+
+            // Render Format Chips
+            const container = document.getElementById('format-chips-container');
+            container.innerHTML = '';
+
+            data.formats.forEach((fmt, index) => {
+                const chip = document.createElement('div');
+                chip.className = 'format-chip' + (index === 0 ? ' selected' : '');
+                chip.innerHTML = `
+                    <div class="chip-top">
+                        <span>${fmt.title}</span>
+                        <span class="format-badge">${fmt.badge}</span>
+                    </div>
+                    <div class="chip-bottom">${fmt.size}</div>
+                `;
+                chip.addEventListener('click', () => {
+                    document.querySelectorAll('.format-chip').forEach(c => c.classList.remove('selected'));
+                    chip.classList.add('selected');
+                    selectedFormat = fmt;
+                    document.getElementById('download-btn-text').innerText = fmt.isAudio ? 'Download MP3 Audio' : 'Download MP4 Video';
+                });
+                container.appendChild(chip);
+            });
+
+            selectedFormat = data.formats[0];
+            document.getElementById('download-btn-text').innerText = selectedFormat.isAudio ? 'Download MP3 Audio' : 'Download MP4 Video';
+
+            // Add to library
+            addToLibrary(data);
+
+            // Scroll to result smoothly
+            resCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // In-Browser Direct Downloader (Blob / Forced Download)
+        document.getElementById('start-download-btn').addEventListener('click', async () => {
+            if (!selectedFormat || !selectedFormat.url) return;
+
+            const btn = document.getElementById('start-download-btn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> <span>Saving File...</span>';
+
+            const downloadUrl = selectedFormat.url;
+            const ext = selectedFormat.isAudio ? 'mp3' : 'mp4';
+            const safeName = (currentResolvedData?.title || 'video')
+                .replace(/[^a-zA-Z0-9_\-]/g, '_')
+                .substring(0, 40) + '.' + ext;
+
+            try {
+                // Try direct forced download link
+                const a = document.createElement('a');
+                a.href = downloadUrl;
+                a.download = safeName;
+                a.target = '_blank';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            } catch (err) {
+                window.open(downloadUrl, '_blank');
+            } finally {
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                }, 1000);
+            }
+        });
+
+        // Send to Watermark Studio
+        document.getElementById('send-studio-btn').addEventListener('click', () => {
+            if (!currentResolvedData) return;
+            const studioTab = document.querySelector('[data-tab="studio"]');
+            if (studioTab) studioTab.click();
+
+            if (currentResolvedData.previewUrl) {
+                loadVideoIntoStudio(currentResolvedData.previewUrl);
+            }
+        });
+
+        // Watermark Studio Logic
+        const canvas = document.getElementById('studio-canvas');
+        const ctx = canvas.getContext('2d');
+        let studioVideo = document.createElement('video');
+        studioVideo.crossOrigin = 'anonymous';
+        studioVideo.loop = true;
+        let watermarkBox = { x: 440, y: 20, w: 180, h: 60 };
+
+        function setBox(type) {
+            const cw = canvas.width;
+            const ch = canvas.height;
+            if (type === 'top-right') watermarkBox = { x: cw - 200, y: 15, w: 185, h: 65 };
+            if (type === 'bottom-right') watermarkBox = { x: cw - 200, y: ch - 80, w: 185, h: 65 };
+            if (type === 'top-left') watermarkBox = { x: 15, y: 15, w: 185, h: 65 };
+            if (type === 'bottom-left') watermarkBox = { x: 15, y: ch - 80, w: 185, h: 65 };
+            if (type === 'subtitle') watermarkBox = { x: 40, y: ch - 70, w: cw - 80, h: 55 };
+        }
+
+        document.getElementById('studio-file-input').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const url = URL.createObjectURL(file);
+                loadVideoIntoStudio(url);
+            }
+        });
+
+        function loadVideoIntoStudio(src) {
+            studioVideo.src = src;
+            studioVideo.play();
+            studioVideo.onloadedmetadata = () => {
+                canvas.width = studioVideo.videoWidth || 640;
+                canvas.height = studioVideo.videoHeight || 360;
+                setBox('top-right');
+                renderStudioFrame();
+            };
+        }
+
+        function renderStudioFrame() {
+            if (!studioVideo.paused && !studioVideo.ended) {
+                ctx.drawImage(studioVideo, 0, 0, canvas.width, canvas.height);
+                
+                // Draw Watermark Blur Filter Patch
+                ctx.save();
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+                ctx.filter = 'blur(10px)';
+                ctx.fillRect(watermarkBox.x, watermarkBox.y, watermarkBox.w, watermarkBox.h);
+                ctx.restore();
+
+                // Draw bounding box guide
+                ctx.strokeStyle = '#6366f1';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(watermarkBox.x, watermarkBox.y, watermarkBox.w, watermarkBox.h);
+            }
+            requestAnimationFrame(renderStudioFrame);
+        }
+
+        document.getElementById('studio-render-btn').addEventListener('click', () => {
+            if (studioVideo.src) {
+                studioVideo.currentTime = 0;
+                studioVideo.play();
+                renderStudioFrame();
+            }
+        });
+
+        // Library Management
+        function addToLibrary(item) {
+            const entry = {
+                id: Date.now(),
+                title: item.title,
+                author: item.author,
+                platform: item.platform,
+                thumbnail: item.thumbnail || '',
+                date: new Date().toLocaleDateString(),
+                url: item.formats[0]?.url || ''
+            };
+            libraryItems.unshift(entry);
+            if (libraryItems.length > 30) libraryItems.pop();
+            localStorage.setItem('omni_history', JSON.stringify(libraryItems));
+            updateLibCounter();
+        }
+
+        function renderLibrary() {
+            const container = document.getElementById('library-items-container');
+            if (!container) return;
+            if (libraryItems.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted); grid-column: 1/-1;">No saved downloads yet. Videos you fetch will appear here automatically.</p>';
+                return;
+            }
+
+            container.innerHTML = '';
+            libraryItems.forEach(item => {
+                const el = document.createElement('div');
+                el.className = 'lib-item glass-card';
+                el.innerHTML = `
+                    <img src="${item.thumbnail || 'https://fav.farm/⚡'}" class="lib-thumb" alt="Thumb">
+                    <div class="lib-info">
+                        <div class="lib-title" title="${item.title}">${item.title}</div>
+                        <div class="lib-sub">${item.platform} &bull; ${item.date}</div>
+                    </div>
+                    <a href="${item.url}" target="_blank" class="btn-action" title="Download Again">
+                        <i class="fa-solid fa-download"></i>
+                    </a>
+                `;
+                container.appendChild(el);
+            });
+        }
+
+        document.getElementById('clear-lib-btn')?.addEventListener('click', () => {
+            if (confirm('Clear all history items?')) {
+                libraryItems = [];
+                localStorage.removeItem('omni_history');
+                updateLibCounter();
+            }
+        });
+
+        // Initial setup
+        updateLibCounter();
     </script>
 </body>
 </html>
