@@ -836,6 +836,9 @@
                 <button class="nav-tab active" data-tab="downloader">
                     <i class="fa-solid fa-bolt"></i> Downloader
                 </button>
+                <button class="nav-tab" data-tab="batch">
+                    <i class="fa-solid fa-layer-group"></i> Batch Download
+                </button>
                 <button class="nav-tab" data-tab="studio">
                     <i class="fa-solid fa-scissors"></i> Watermark Studio
                 </button>
@@ -954,6 +957,58 @@
                         <h4>MP3 Audio Extraction</h4>
                         <p>Instant crystal-clear 320kbps MP3 sound.</p>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        
+        <!-- TAB: Batch Downloader (Multi-Link) -->
+        <section class="tab-panel" id="panel-batch">
+            <div class="hero-banner">
+                <h2 class="hero-title"><i class="fa-solid fa-layer-group" style="color:var(--primary); margin-right:8px;"></i> Batch Video Downloader</h2>
+                <p class="hero-desc">Paste multiple URLs to download entire playlists, TikTok accounts, Instagram reels, or YouTube videos simultaneously.</p>
+            </div>
+
+            <div class="glass-card" style="padding: 28px; display: flex; flex-direction: column; gap: 20px;">
+                <div>
+                    <label style="display: block; font-weight: 700; font-size: 0.92rem; margin-bottom: 8px; color: var(--text-primary);">
+                        <i class="fa-solid fa-list-ol"></i> Enter URLs (One link per line):
+                    </label>
+                    <textarea id="batch-urls-input" rows="7" class="url-input" style="width: 100%; height: 160px; padding: 14px; border-radius: var(--radius-md); background: rgba(10, 15, 29, 0.85); border: 1px solid var(--border-glass); color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 0.88rem; line-height: 1.6; resize: vertical;" placeholder="https://www.tiktok.com/@user/video/1&#10;https://www.instagram.com/reel/abc123&#10;https://www.youtube.com/watch?v=xyz789&#10;https://www.facebook.com/watch/?v=456"></textarea>
+                </div>
+
+                <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 18px; background: rgba(10, 15, 29, 0.5); border-radius: var(--radius-md); border: 1px solid var(--border-glass);">
+                    <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.88rem; font-weight: 600;">
+                            <input type="checkbox" id="batch-nowm-toggle" checked style="accent-color: var(--primary); width: 18px; height: 18px;">
+                            <span>Auto-Remove Watermark</span>
+                        </label>
+                        <div style="display: flex; align-items: center; gap: 8px; font-size: 0.88rem; font-weight: 600;">
+                            <span>Format:</span>
+                            <select id="batch-format-select" style="background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid var(--border-glass); border-radius: 6px; padding: 6px 12px; font-family: inherit; font-size: 0.85rem; outline: none; cursor: pointer;">
+                                <option value="video">Best HD Video (MP4)</option>
+                                <option value="audio">Extract MP3 Audio (320kbps)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button class="btn-primary" id="btn-start-batch" style="padding: 10px 24px;">
+                        <i class="fa-solid fa-play"></i> <span>Start Batch Download</span>
+                    </button>
+                </div>
+
+                <!-- Batch Queue Progress List -->
+                <div id="batch-queue-container" style="display: none; margin-top: 10px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                        <h4 style="font-size: 1rem; font-weight: 700; color: #fff;">
+                            <i class="fa-solid fa-list-check"></i> Queue Status (<span id="batch-completed-count">0</span>/<span id="batch-total-count">0</span>)
+                        </h4>
+                        <button class="btn-action" id="btn-download-all-batch" style="display: none;">
+                            <i class="fa-solid fa-cloud-arrow-down"></i> Download All
+                        </button>
+                    </div>
+
+                    <div id="batch-items-list" style="display: flex; flex-direction: column; gap: 10px;"></div>
                 </div>
             </div>
         </section>
@@ -1483,6 +1538,142 @@
 
         // Initial setup
         updateLibCounter();
+    
+        // ==========================================
+        // BATCH DOWNLOADER (MULTI-LINK) ENGINE
+        // ==========================================
+        const btnStartBatch = document.getElementById('btn-start-batch');
+        const batchUrlsInput = document.getElementById('batch-urls-input');
+        const batchQueueContainer = document.getElementById('batch-queue-container');
+        const batchItemsList = document.getElementById('batch-items-list');
+        const batchCompletedCount = document.getElementById('batch-completed-count');
+        const batchTotalCount = document.getElementById('batch-total-count');
+        const btnDownloadAllBatch = document.getElementById('btn-download-all-batch');
+
+        let batchResolvedItems = [];
+
+        btnStartBatch?.addEventListener('click', async () => {
+            const rawText = batchUrlsInput.value.trim();
+            if (!rawText) {
+                alert('Please enter at least one video URL in the box (one link per line)!');
+                return;
+            }
+
+            const urls = rawText.split('\n')
+                .map(u => u.trim())
+                .filter(u => u.startsWith('http://') || u.startsWith('https://'));
+
+            if (urls.length === 0) {
+                alert('No valid URLs found. Make sure each link starts with https://');
+                return;
+            }
+
+            btnStartBatch.disabled = true;
+            btnStartBatch.innerHTML = '<span class="spinner"></span> Processing Queue...';
+            batchQueueContainer.style.display = 'block';
+            batchItemsList.innerHTML = '';
+            btnDownloadAllBatch.style.display = 'none';
+            batchResolvedItems = [];
+
+            batchTotalCount.innerText = urls.length;
+            batchCompletedCount.innerText = '0';
+
+            const isAudioMode = document.getElementById('batch-format-select').value === 'audio';
+
+            // Create queue item placeholders
+            const domItems = urls.map((url, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'glass-card';
+                itemDiv.style.cssText = 'padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px;';
+                itemDiv.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 12px; overflow: hidden; flex: 1;">
+                        <span style="font-weight: 700; font-size: 0.85rem; color: var(--primary); min-width: 24px;">#${index + 1}</span>
+                        <div style="overflow: hidden;">
+                            <div style="font-size: 0.88rem; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="batch-title-${index}">${url}</div>
+                            <div style="font-size: 0.74rem; color: var(--text-muted);" id="batch-status-${index}"><i class="fa-solid fa-clock"></i> Waiting in queue...</div>
+                        </div>
+                    </div>
+                    <div id="batch-action-${index}">
+                        <span class="status-chip" style="background: rgba(255, 255, 255, 0.08); color: var(--text-secondary); border-color: var(--border-glass);">Queued</span>
+                    </div>
+                `;
+                batchItemsList.appendChild(itemDiv);
+                return itemDiv;
+            });
+
+            // Process sequentially
+            let completed = 0;
+            for (let i = 0; i < urls.length; i++) {
+                const url = urls[i];
+                const statusEl = document.getElementById(`batch-status-${i}`);
+                const titleEl = document.getElementById(`batch-title-${i}`);
+                const actionEl = document.getElementById(`batch-action-${i}`);
+
+                statusEl.innerHTML = '<span class="spinner" style="width:12px;height:12px;border-width:1px;"></span> Resolving video stream...';
+
+                try {
+                    let res = null;
+                    if (url.includes('tiktok.com') || url.includes('douyin')) {
+                        res = await fetchTikTokDirect(url);
+                    } else {
+                        res = await fetchGeneralMedia(url);
+                    }
+
+                    if (res && res.formats && res.formats.length > 0) {
+                        const chosenFmt = isAudioMode 
+                            ? (res.formats.find(f => f.isAudio) || res.formats[0]) 
+                            : res.formats[0];
+
+                        titleEl.innerText = res.title;
+                        statusEl.innerHTML = `<span style="color: var(--accent-emerald); font-weight: 600;"><i class="fa-solid fa-circle-check"></i> Ready &bull; ${chosenFmt.badge}</span>`;
+                        actionEl.innerHTML = `
+                            <a href="${chosenFmt.url}" target="_blank" download class="btn-action" style="background: var(--primary); color: #fff; border: none; font-size: 0.78rem; padding: 6px 12px;">
+                                <i class="fa-solid fa-download"></i> Save ${isAudioMode ? 'MP3' : 'MP4'}
+                            </a>
+                        `;
+
+                        batchResolvedItems.push({
+                            url: chosenFmt.url,
+                            name: (res.title || 'video').replace(/[^a-zA-Z0-9_-]/g, '_').substring(0, 35) + (isAudioMode ? '.mp3' : '.mp4')
+                        });
+
+                        addToLibrary(res);
+                    } else {
+                        statusEl.innerHTML = '<span style="color: #f43f5e;"><i class="fa-solid fa-circle-xmark"></i> Failed to resolve</span>';
+                    }
+                } catch (err) {
+                    statusEl.innerHTML = '<span style="color: #f43f5e;"><i class="fa-solid fa-circle-xmark"></i> Error</span>';
+                }
+
+                completed++;
+                batchCompletedCount.innerText = completed;
+                // Small courteous delay
+                await new Promise(r => setTimeout(r, 400));
+            }
+
+            btnStartBatch.disabled = false;
+            btnStartBatch.innerHTML = '<i class="fa-solid fa-play"></i> <span>Start Batch Download</span>';
+
+            if (batchResolvedItems.length > 1) {
+                btnDownloadAllBatch.style.display = 'inline-flex';
+            }
+        });
+
+        // Bulk download all resolved files
+        btnDownloadAllBatch?.addEventListener('click', () => {
+            batchResolvedItems.forEach((item, index) => {
+                setTimeout(() => {
+                    const a = document.createElement('a');
+                    a.href = item.url;
+                    a.download = item.name;
+                    a.target = '_blank';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                }, index * 800);
+            });
+        });
+
     </script>
 </body>
 </html>
