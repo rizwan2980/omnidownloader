@@ -1155,7 +1155,7 @@
             document.getElementById('progress-box').style.display = 'none';
         }
 
-        // Core Resolver (TikTok, Instagram, YouTube, etc.)
+        // Core High-Speed Resolver (Facebook Reels, TikTok, Instagram, YouTube)
         document.getElementById('fetch-btn').addEventListener('click', async () => {
             const url = urlInput.value.trim();
             if (!url) {
@@ -1166,12 +1166,47 @@
             const fetchBtn = document.getElementById('fetch-btn');
             fetchBtn.disabled = true;
             fetchBtn.innerHTML = '<span class="spinner"></span> <span>Fetching...</span>';
-            showProgress('Connecting to high-speed CDN resolver...', 20);
+            showProgress('Connecting to high-speed video extractor...', 25);
 
             try {
-                // Specialized TikTok No-Watermark resolution via TikWM & CORS proxies
+                // 1. High-Speed Local/Edge Engine (Resolves Facebook Reels, Instagram, YouTube in ~1 sec with 0MB laptop load)
+                try {
+                    const localResp = await fetch('http://127.0.0.1:8000/api/extract-info', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ url: url })
+                    });
+                    if (localResp.ok) {
+                        const localData = await localResp.json();
+                        if (localData && localData.success && localData.formats && localData.formats.length > 0) {
+                            displayResult({
+                                title: localData.title || 'Social Media Video',
+                                author: localData.author || localData.platform || 'Creator',
+                                duration: localData.duration ? formatSeconds(localData.duration) : 'HD Quality',
+                                platform: (localData.platform || 'Video').toUpperCase(),
+                                thumbnail: localData.thumbnail || '',
+                                previewUrl: localData.formats[0]?.url || null,
+                                formats: localData.formats.map(f => ({
+                                    id: f.format_id || 'mp4',
+                                    title: `${f.resolution || 'HD'} ${f.ext ? f.ext.toUpperCase() : 'MP4'}`,
+                                    badge: f.badge || (f.is_audio ? 'AUDIO' : 'HD FAST'),
+                                    size: f.filesize || f.quality_label || 'Direct CDN',
+                                    url: f.url,
+                                    isAudio: f.is_audio || false
+                                }))
+                            });
+                            showProgress('Done!', 100);
+                            setTimeout(hideProgress, 600);
+                            return;
+                        }
+                    }
+                } catch (e) {
+                    console.log('Trying cloud fallback proxies...', e);
+                }
+
+                // 2. TikTok Specialized CDN Resolver
                 if (url.includes('tiktok.com') || url.includes('douyin')) {
-                    showProgress('Extracting original watermark-free HD stream...', 55);
+                    showProgress('Extracting original watermark-free HD stream...', 60);
                     const tikwmRes = await fetchTikTokDirect(url);
                     if (tikwmRes) {
                         displayResult(tikwmRes);
@@ -1181,8 +1216,8 @@
                     }
                 }
 
-                // General Resolver for Instagram, YouTube, Facebook, Twitter, Direct MP4
-                showProgress('Resolving video stream & format options...', 65);
+                // 3. General Fallback
+                showProgress('Checking fallback CDN streams...', 75);
                 const generalRes = await fetchGeneralMedia(url);
                 if (generalRes) {
                     displayResult(generalRes);
@@ -1191,7 +1226,7 @@
                     return;
                 }
 
-                alert('Could not automatically resolve this link. If it is private or restricted, try pasting a direct public link.');
+                alert('Could not automatically resolve this link. Please ensure the video/reel is public.');
             } catch (err) {
                 console.error(err);
                 alert('Error fetching video: ' + err.message);
@@ -1613,10 +1648,41 @@
 
                 try {
                     let res = null;
-                    if (url.includes('tiktok.com') || url.includes('douyin')) {
-                        res = await fetchTikTokDirect(url);
-                    } else {
-                        res = await fetchGeneralMedia(url);
+                    // Try high-speed engine first for batch item
+                    try {
+                        const localResp = await fetch('http://127.0.0.1:8000/api/extract-info', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ url: url })
+                        });
+                        if (localResp.ok) {
+                            const ld = await localResp.json();
+                            if (ld && ld.success && ld.formats && ld.formats.length > 0) {
+                                res = {
+                                    title: ld.title || 'Video',
+                                    author: ld.author || ld.platform || 'Creator',
+                                    duration: ld.duration ? formatSeconds(ld.duration) : 'HD Quality',
+                                    platform: ld.platform || 'Video',
+                                    thumbnail: ld.thumbnail || '',
+                                    formats: ld.formats.map(f => ({
+                                        id: f.format_id || 'mp4',
+                                        title: `${f.resolution || 'HD'} MP4`,
+                                        badge: f.badge || (f.is_audio ? 'AUDIO' : 'HD'),
+                                        size: f.filesize || 'Direct',
+                                        url: f.url,
+                                        isAudio: f.is_audio || false
+                                    }))
+                                };
+                            }
+                        }
+                    } catch(e) {}
+
+                    if (!res) {
+                        if (url.includes('tiktok.com') || url.includes('douyin')) {
+                            res = await fetchTikTokDirect(url);
+                        } else {
+                            res = await fetchGeneralMedia(url);
+                        }
                     }
 
                     if (res && res.formats && res.formats.length > 0) {
